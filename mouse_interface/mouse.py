@@ -4,6 +4,8 @@ import math
 from py_helpers import Point
 from py_helpers import Rectangle
 
+import numpy as np
+
 
 class mouseIF:
     ### standards
@@ -58,3 +60,37 @@ class mouseIF:
         return Point(x=pos.x - self.offset.x, y=pos.y - self.offset.y)
 
     ###private
+
+
+def human_like_mouse_move(end: Point, duration: int = 2):
+    start_pos = pyautogui.position()
+    start = Point(x=start_pos.x, y=start_pos.y)
+
+    # Generate time steps
+    t: np.ndarray = np.linspace(0, 1, num=100)
+
+    # Generate random control points for Bezier curve
+    control_points: np.ndarray = np.array(
+        [
+            start,
+            start + (end + (start * (-1))) * np.random.rand(),
+            end + (end + (start * (-1))) * (-1) * np.random.rand(),
+            end,
+        ]
+    )
+
+    # Calculate the Bezier curve points
+    bezier_curve = (
+        (1 - t) ** 3 * control_points[0]
+        + 3 * (1 - t) ** 2 * t * control_points[1]
+        + 3 * (1 - t) * t**2 * control_points[2]
+        + t**3 * control_points[3]
+    )
+
+    # Move mouse
+    for point in bezier_curve:
+        pyautogui.moveTo(point[0], point[1], duration=duration / len(bezier_curve))
+
+
+if __name__ == "__main__":
+    human_like_mouse_move(end=Point(2, 2))
