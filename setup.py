@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='mouse_interface',
-    version='1.0.0',
+    version='1.0.1',
     packages=find_packages(),
     description='Interface for interactions with the users mouse',
     long_description=open('README.md').read(),
