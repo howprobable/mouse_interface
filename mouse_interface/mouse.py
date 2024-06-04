@@ -6,6 +6,12 @@ from py_helpers import Rectangle
 
 import numpy as np
 
+import time
+
+# pyautogui.MINIMUM_DURATION = 0.01
+# pyautogui.MINIMUM_SLEEP = 0.01
+# pyautogui.PAUSE = 0.01
+
 
 class mouseIF:
     ### standards
@@ -62,12 +68,12 @@ class mouseIF:
     ###private
 
 
-def human_like_mouse_move(end: Point, duration: int = 2):
+def human_like_mouse_move(end: Point, duration: float = 1.0):
     start_pos = pyautogui.position()
     start = Point(x=start_pos.x, y=start_pos.y)
 
     # Generate time steps
-    t: np.ndarray = np.linspace(0, 1, num=100)
+    t: np.ndarray = np.linspace(0, 1, num=5)
 
     # Generate random control points for Bezier curve
     control_points: np.ndarray = np.array(
@@ -87,9 +93,15 @@ def human_like_mouse_move(end: Point, duration: int = 2):
         + t**3 * control_points[3]
     )
 
+    print("Curve: ", bezier_curve)
+    print("Duration: ", duration / len(bezier_curve))
+
     # Move mouse
     for point in bezier_curve:
-        pyautogui.moveTo(point[0], point[1], duration=duration / len(bezier_curve))
+        print(f"Starting to move to {point}: {time.time()}")
+        pyautogui.moveTo(point[0], point[1])
+        pyautogui.sleep(duration / len(bezier_curve))
+        print(f"Done with this movement: {time.time()}")
 
 
 if __name__ == "__main__":
