@@ -91,6 +91,9 @@ class mouseIF:
             wait_to = start_time + i*(duration/len(bezier_curve))
             if now < wait_to: 
                 pyautogui.sleep(wait_to - now)
+
+    def reset_mouse_size(self): 
+        self.set_mouse_size(32)
             
     def set_mouse_size(self, size: int):
         ps: str = f"""
