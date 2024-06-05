@@ -1,6 +1,7 @@
 from typing import Union, Optional
 import pyautogui
 import math
+import subprocess
 from py_helpers import Point
 from py_helpers import Rectangle
 
@@ -62,7 +63,6 @@ class mouseIF:
 
         return Point(x=pos.x - self.offset.x, y=pos.y - self.offset.y)
 
-    ###private
     def human_like_mouse_move(end: Point, duration: float = 1.0):
         start_pos = pyautogui.position()
         start = Point(x=start_pos.x, y=start_pos.y)
@@ -92,7 +92,31 @@ class mouseIF:
             if now < wait_to: 
                 pyautogui.sleep(wait_to - now)
             
+    def set_mouse_size(self, size: int):
+        ps: str = f"""
+$CSharpSig = @'
+[DllImport("user32.dll", EntryPoint = "SystemParametersInfo")]
+public static extern bool SystemParametersInfo(
+                  uint uiAction,
+                  uint uiParam,
+                  uint pvParam,
+                  uint fWinIni);
+'@
+$CursorRefresh = Add-Type -MemberDefinition $CSharpSig -Name WinAPICall -Namespace SystemParamInfo -PassThru
+$CursorRefresh::SystemParametersInfo(0x0057,0,$null,0);
+$CursorRefresh::SystemParametersInfo(0x2029, 0, {size}, 0x01);
+"""
+        subprocess.run(["powershell", "-Command", ps], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
+    ###private
 
-# if __name__ == "__main__":
-#     mouseIF.human_like_mouse_move(end=Point(2, 2))
+if __name__ == "__main__":
+    mouseIF = mouseIF()
+    print("Making mouse bigger...")
+    mouseIF.set_mouse_size(128)
+
+    time.sleep(3)
+
+    print("Making mouse smaller...")
+    mouseIF.set_mouse_size(32)
+
