@@ -1,6 +1,5 @@
-from typing import Union, Optional
+from typing import  Optional
 import pyautogui
-import math
 import subprocess
 from py_helpers import Point
 from py_helpers import Rectangle
@@ -37,10 +36,10 @@ class mouseIF:
 
     def go_to(self, pos: Point, duration: float = 1.0, natural: bool = True) -> None:
         if self.window:
-            pos = self.window.getEdgeIfOutside(p=pos)
+            pos : Point = self.window.getEdgeIfOutside(p=pos)
 
         if natural:
-            self.human_like_mouse_move(end=pos, duration=duration)
+            self.human_like_mouse_move(pos=pos, duration=duration)
         else:
             pyautogui.moveTo(
                 x=self.offset.x + pos.x, y=self.offset.y + pos.y, duration=duration
@@ -63,7 +62,7 @@ class mouseIF:
 
         return Point(x=pos.x - self.offset.x, y=pos.y - self.offset.y)
 
-    def human_like_mouse_move(end: Point, duration: float = 1.0):
+    def human_like_mouse_move(self, pos: Point, duration: float = 1.0):
         start_pos = pyautogui.position()
         start = Point(x=start_pos.x, y=start_pos.y)
         t: np.ndarray = np.linspace(0, 1, num=25)
@@ -71,9 +70,9 @@ class mouseIF:
         control_points: np.ndarray = np.array(
             [
                 start,
-                start + (end + (start * (-1))) * np.random.rand(),
-                end + (end + (start * (-1))) * (-1) * np.random.rand(),
-                end,
+                start + (pos + (start * (-1))) * np.random.rand(),
+                pos + (pos + (start * (-1))) * (-1) * np.random.rand(),
+                pos,
             ]
         )
         bezier_curve = (
@@ -115,10 +114,23 @@ $CursorRefresh::SystemParametersInfo(0x2029, 0, {size}, 0x01);
 
 if __name__ == "__main__":
     mouseIF = mouseIF()
+
+    pos = mouseIF.get_position()
+
     print("Making mouse bigger...")
     mouseIF.set_mouse_size(128)
 
-    time.sleep(3)
+    time.sleep(1)
+    
+    print("Moving mouse to 100, 100...")
+    mouseIF.go_to(pos=Point(100, 100), duration=1.0)
+
+    time.sleep(1)
+    
+    print("Going back to original position...")
+    mouseIF.go_to(pos=pos, duration=1.0)
+
+    time.sleep(1)
 
     print("Making mouse smaller...")
     mouseIF.set_mouse_size(32)
